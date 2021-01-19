@@ -2,9 +2,9 @@
 
 Will be adding more to the list
 
-*Sagemaker
-*Deepracer
-*Personalise 
+* Sagemaker
+* Deepracer
+* Personalise 
 
 
 # Setting up AMI (EC2) 
