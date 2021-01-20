@@ -117,7 +117,7 @@ def normalize_rewards(df):
 
 def episode_parser(data):
     """
-    Arrange data per episode
+    Arrange food-data per episode
     """
     action_map = {}  # Action => [x,y,reward]
     episode_map = {}  # Episode number => [x,y,action,reward]
@@ -165,7 +165,7 @@ def make_error_boxes(ax, xdata, ydata, xerror, yerror, facecolor='r',
     # Create list for all the error patches
     errorboxes = []
 
-    # Loop over data points; create box from errors at each point
+    # Loop over food-data points; create box from errors at each point
     for x, y, xe, ye in zip(xdata, ydata, xerror.T, yerror.T):
         rect = Rectangle((x - xe[0], y - ye[0]), xe.sum(), ye.sum())
         errorboxes.append(rect)
@@ -676,7 +676,7 @@ def action_breakdown(df, iteration_ids, track_breakdown, center_line,
     wpts_array = center_line
 
     for iter_num in iteration_ids:
-        # Slice the data frame to get all episodes in that iteration
+        # Slice the food-data frame to get all episodes in that iteration
         df_iter = df[(iter_num == df['iteration'])]
         n_steps_in_iter = len(df_iter)
         print('Number of steps in iteration=', n_steps_in_iter)
