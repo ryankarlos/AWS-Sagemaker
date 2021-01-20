@@ -1,4 +1,4 @@
-# Machine Learning projects/services I have played around with in AWS
+## Machine Learning projects/services I have played around with in AWS
 
 Will be adding more to the list
 
@@ -7,9 +7,10 @@ Will be adding more to the list
 * Personalise 
 
 
-# Setting up AMI (EC2) 
+### Setting up AMI (EC2) 
 
-I normally find Sagemaker Notebook instance quote cool as easy to launch a set the kernel with preinstalled popular open-source deep learning frameworks, including TensorFlow, Apache MXNet, PyTorch. 
+I normally find Sagemaker Notebook instance  https://docs.aws.amazon.com/sagemaker/latest/dg/howitworks-create-ws.html quote cool as easy to launch a set the kernel with preinstalled popular open-source deep learning frameworks, including TensorFlow, Apache MXNet, PyTorch. It also allows linking git repo and working from there and making changes https://docs.aws.amazon.com/sagemaker/latest/dg/nbi-git-create.html
+
 However, sometimes its quite useful to setup EC2 instance with Deep Learning AMI with GPU if i need to do some work on the terminal and run pythin scripts to take advantage of GPU.
 I found on this amazon blog post https://aws.amazon.com/blogs/machine-learning/get-started-with-deep-learning-using-the-aws-deep-learning-ami/
 
@@ -26,7 +27,19 @@ once inside container e..g
 
 `ubuntu@ip-172-31-2-142:~$ conda activate tensorflow_p36`
 
-# Copy files from locally to AWS instance - can use SCP protocol from terminal
+###  Copy files from locally to AWS instance - can use SCP protocol from terminal
 `scp -i deep-learning.pem <path-to-file> user@hostname:<file-path-to-be-copied-on-remote>`
 
 
+### creating S3 buckets and copying data
+I mainly use S3 simple storage for dumping most of the input data - csv, json, .lst files etc. Can do this on AWS GUI but i prefer AWS CLI. 
+First need to install AWS cli https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html 
+
+* create bucket https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/create-bucket.html
+aws s3api create-bucket --bucket <bucket-name> --region eu-west-2 --create-bucket-configuration LocationConstraint=eu-west-2
+
+
+* copy from local to aws s3 or vice versa https://docs.aws.amazon.com/cli/latest/reference/s3/
+
+aws s3 cp <local-path> s3://<bucket-name>/ --recursive --quiet
+aws s3 cp s3://<bucket-name>/ <local-path> --recursive --quiet
