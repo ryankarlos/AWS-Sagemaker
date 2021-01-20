@@ -36,10 +36,8 @@ I mainly use S3 simple storage for dumping most of the input data - csv, json, .
 First need to install AWS cli https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html 
 
 * create bucket https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/create-bucket.html
-aws s3api create-bucket --bucket <bucket-name> --region eu-west-2 --create-bucket-configuration LocationConstraint=eu-west-2
-
+`aws s3api create-bucket --bucket <bucket-name> --region eu-west-2 --create-bucket-configuration LocationConstraint=eu-west-2`
 
 * copy from local to aws s3 or vice versa https://docs.aws.amazon.com/cli/latest/reference/s3/
-
-aws s3 cp <local-path> s3://<bucket-name>/ --recursive --quiet
-aws s3 cp s3://<bucket-name>/ <local-path> --recursive --quiet
+`aws s3 cp <local-path> s3://<bucket-name>/ --recursive --quiet`
+`aws s3 cp s3://<bucket-name>/ <local-path> --recursive --quiet`
