@@ -29,7 +29,24 @@ Then resumed training by using Huber with larger batch size.
 
 - 60 or 80 mins
 
+## Updating the environment for running notebook
+
+create and activate new environment
+
+```
+python3 -m venv venv
+source venv/bin/activate
+```
+
+install/upgrade packages from requirements.txt
+
+```
+pip install --upgrade -r requirements.txt
+jupyter lab
+```
+
 ## References and Credits
 
 * Reward functions: https://docs.aws.amazon.com/deepracer/latest/developerguide/deepracer-reward-function-examples.html
-* Log analysis: Training log analysis from Sagemaker and Robomaker using the notebooks provided from the official Deep Racer repo updated by the community  https://github.com/aws-samples/aws-deepracer-workshops/tree/master/log-analysis
+* Log analysis:  Training log analysis from Sagemaker and Robomaker using the notebooks provided from the official Deep Racer repo updated by the community 
+ https://github.com/aws-samples/aws-deepracer-workshops/tree/master/log-analysishttps://github.com/aws-deepracer-community/deepracer-analysis
