@@ -1,3 +1,4 @@
+# Deep Racer reward function and log analysis
 
 The following training params and action space settings were used during the AWS March 2021 Qualifier in the open division-time trial on the Po-Chun Speedway circuit (68.683m)
 
