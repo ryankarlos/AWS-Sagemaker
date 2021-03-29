@@ -1,6 +1,7 @@
 
 The following training params and action space settings were used during the AWS March 2021 Qualifier in the open division-time trial on the Po-Chun Speedway circuit (68.683m)
 
+Being a causal competitor I managed to get a rank of 150 out of 1000 with just 8 hours of training ($30 Deep Racer credits)
 
 ## Action space
 
@@ -28,3 +29,7 @@ Then resumed training by using Huber with larger batch size.
 
 - 60 or 80 mins
 
+## References and Credits
+
+* Reward functions: https://docs.aws.amazon.com/deepracer/latest/developerguide/deepracer-reward-function-examples.html
+* Log analysis: Training log analysis from Sagemaker and Robomaker using the notebooks provided from the official Deep Racer repo updated by the community  https://github.com/aws-samples/aws-deepracer-workshops/tree/master/log-analysis
