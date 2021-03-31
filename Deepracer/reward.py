@@ -1,27 +1,24 @@
-def reward_function(params):
+import math
 
+
+def reward_function(params):
     MAX_REWARD = 1e2
     MIN_REWARD = 1e-3
+    INITIAL_REWARD = 1
     DIRECTION_THRESHOLD = 10.0
-    ABS_STEERING_THRESHOLD = 29
+    ABS_STEERING_THRESHOLD = 15
+    TOTAL_NUM_STEPS = 2700
 
-    on_track = params['all_wheels_on_track']
     distance_from_center = params['distance_from_center']
     track_width = params['track_width']
-    steering = abs(params['steering_angle']) # Only need the absolute steering angle for calculations
-    speed = params['speed']
+    steering = abs(params['steering_angle'])  # Only need the absolute steering angle for calculations
     progress = params['progress']
-    
-    # initialise reward
-    reward = 1e-2
-    
+    waypoints = params['waypoints']
+    closest_waypoints = params['closest_waypoints']
+    heading = params['heading']
+    steps = params['steps']
 
-    def on_track_reward(current_reward, on_track):
-        if not on_track:
-            current_reward = MIN_REWARD
-        else:
-            current_reward = MAX_REWARD
-        return current_reward
+    reward = INITIAL_REWARD
 
     def distance_from_center_reward(current_reward, track_width, distance_from_center):
         # Calculate 3 marks that are farther and father away from the center line
@@ -41,34 +38,55 @@ def reward_function(params):
 
         return current_reward
 
-    def straight_line_reward(current_reward, steering, speed):
-        # Positive reward if the car is in a straight line going fast
-        if abs(steering) < 0.1 and speed > 2.5:
-            current_reward *= 1.8
-        return current_reward
-
-
     def steering_reward(current_reward, steering):
         # Penalize reward if the car is steering too much (your action space will matter)
         if abs(steering) > ABS_STEERING_THRESHOLD:
-            current_reward += 0.9
+            current_reward += 0.8
         return current_reward
-        
-    def track_completion_reward(current_reward,progress ):
+
+    def track_completion_reward(current_reward, progress):
         if progress > 50:
-            current_reward *= 1.2
-        elif progress > 75:
-            current_reward *= 2
+            current_reward += 30
+        elif progress > 60:
+            current_reward += 60
+        elif progress > 70:
+            current_reward += 100
         elif progress == 100:
-            current_reward *= 5
+            current_reward += 1000
         return current_reward
 
+    def direction_reward(current_reward, waypoints, closest_waypoints, heading):
+        next_point = waypoints[closest_waypoints[1]]
+        prev_point = waypoints[closest_waypoints[0]]
 
-    reward = on_track_reward(reward, on_track)
+        # Calculate the direction in radius, arctan2(dy, dx), the result is (-pi, pi) in radians
+        direction = math.atan2(next_point[1] - prev_point[1], next_point[0] - prev_point[0])
+        # Convert to degrees
+        direction = math.degrees(direction)
+
+        # Cacluate difference between track direction and car heading angle
+        direction_diff = abs(direction - heading)
+        if direction_diff > 180:
+            direction_diff = 360 - direction_diff
+
+        # Penalize if the difference is too large
+        if direction_diff > DIRECTION_THRESHOLD:
+            current_reward *= 0.75
+
+        return current_reward
+
+    def fewer_steps_reward(current_reward, steps, progress):
+
+        # Give additional reward if the car pass every 100 steps faster than expected
+        if (steps % 100) == 0 and progress > (steps / TOTAL_NUM_STEPS) * 100:
+            current_reward += 10.0
+
+        return float(current_reward)
+
     reward = distance_from_center_reward(reward, track_width, distance_from_center)
-    reward = straight_line_reward(reward, steering, speed)
     reward = steering_reward(reward, steering)
+    reward = direction_reward(reward, waypoints, closest_waypoints, heading)
     reward = track_completion_reward(reward, progress)
-    
+    reward = fewer_steps_reward(reward, steps, progress)
 
     return float(reward)
