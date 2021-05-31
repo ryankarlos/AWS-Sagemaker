@@ -14,7 +14,6 @@ def get_sagemaker_session():
 
 
 def download_sample_dataset_to_local(region, local_path):
-
     s3 = boto3.resource("s3")
     s3.Bucket(f"sagemaker-servicecatalog-seedcode-{region}").download_file(
         abalone_dataset_default_path,
@@ -32,4 +31,6 @@ def upload_dataset_to_s3(default_bucket, local_path):
     
     
 if __name__ == "__main__":
-    get_sagemaker_session()
+    default_bucket, role, region = get_sagemaker_session()
+    download_sample_dataset_to_local(region, local_path)
+    upload_dataset_to_s3(default_bucket, local_path)
