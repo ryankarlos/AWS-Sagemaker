@@ -1,10 +1,6 @@
-## Machine Learning projects/services I have played around with in AWS
+## ML traning and deployment in Sagemaker
 
-Will be adding more to the list
-
-* Sagemaker
-* Deepracer
-* Personalise 
+In prep for the AWS ML certification exam
 
 
 ### Setting up AMI (EC2) 
