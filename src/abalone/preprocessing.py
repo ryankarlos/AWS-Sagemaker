@@ -1,4 +1,4 @@
-%%writefile abalone/preprocessing.py
+
 import argparse
 import os
 import requests
@@ -11,7 +11,6 @@ from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
-
 
 # Because this is a headerless CSV file, specify the column names here.
 feature_columns_names = [
