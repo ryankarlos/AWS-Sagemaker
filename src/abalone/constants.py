@@ -1,5 +1,4 @@
 
-# Because this is a headerless CSV file, specify the column names here.
 NUMERIC_COLS = [
     "length",
     "diameter",

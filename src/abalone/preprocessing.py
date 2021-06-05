@@ -5,13 +5,14 @@ import tempfile
 import numpy as np
 import pandas as pd
 
-
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
+
 from .constants import  *
 from .io import read_data_from_csv, save_output_to_csv
+
 
 
 def merge_two_dicts(x, y):
@@ -36,7 +37,6 @@ def cat_transformer():
         ]
     )
 
-
 def preprocess_pipeline(df):    
     preprocess_transformer = ColumnTransformer(
         transformers=[
@@ -48,12 +48,14 @@ def preprocess_pipeline(df):
     return preprocess_transformer.fit_transform(X)
     
 
-
 def reshape_label_col(df):
     y = df.loc[:, LABEL]
     return y.to_numpy().reshape(len(y), 1)    
     
 
+def concat_feat_label_after_transform(X_pre, y_pre):
+    return np.concatenate((y_pre, X_pre), axis=1)
+    
 def train_val_test_split(X):
     np.random.shuffle(X)
     train, validation, test = np.split(X, [int(.7*len(X)), int(.85*len(X))])
@@ -64,11 +66,9 @@ def train_val_test_split(X):
 if __name__ == "__main__":
     
     df = read_data_from_csv()
-
-    y = df.pop(LABEL)
-    X_pre = preprocess_pipeline().fit_transform(df)
-   
-    X = np.concatenate((y_pre, X_pre), axis=1)
+    X_pre = preprocess_pipeline(df)
+    y_pre = reshape_label_col(df)   
+    X = concat_feat_label_after_transform(X_pre, y_pre)
     
     train_val_test_dict = train_val_test_split(X)
     save_output_to_csv(**train_val_test_dict)
