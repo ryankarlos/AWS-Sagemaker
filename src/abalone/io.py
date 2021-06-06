@@ -17,10 +17,10 @@ def merge_two_dicts(x, y):
     return z
 
 
-def read_data_from_csv(filename="abalone-dataset.csv"):
+def read_data_from_csv(filepath):
     names = CAT_COLS + NUMERIC_COLS + [LABEL]
     logger.info(f"setting header names as: {names}")
-    df = pd.read_csv(os.path.join("/opt/ml/processing/input", filename),
+    df = pd.read_csv(filepath,
         header=None, 
         names=names,
         dtype=merge_two_dicts(FEATURE_COLS_DTYPE, LABEL_DTYPE)
@@ -29,9 +29,9 @@ def read_data_from_csv(filename="abalone-dataset.csv"):
     return df
 
 
-def save_output_to_csv(**kwargs):
+def save_output_to_csv(base_dir, **kwargs):
     for k,v in kwargs.items():
-        par_dir = f"/opt/ml/processing/{k}"
+        par_dir = os.path.join(base_dir, k)
         if not os.path.exists(par_dir):
             logger.info('Train/Val/Test dirs do not exist so creating them')
             os.makedirs(par_dir)           

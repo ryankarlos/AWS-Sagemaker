@@ -5,7 +5,7 @@ from sagemaker.workflow.parameters import (
 from utils.session_initialisation import get_sagemaker_session
 
 
-default_bucket, role, region = get_sagemaker_session()
+default_bucket, role, region, sagemaker_session = get_sagemaker_session()
 
 processing_instance_count = ParameterInteger(
     name="ProcessingInstanceCount",

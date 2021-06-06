@@ -8,8 +8,7 @@ def get_sagemaker_session():
     sagemaker_session = sagemaker.session.Session()
     role = sagemaker.get_execution_role()
     default_bucket = sagemaker_session.default_bucket()
-    print(default_bucket)
-    return default_bucket, role, region
+    return default_bucket, role, region, sagemaker_session
 
     
 def upload_dataset_to_s3(default_bucket, local_path):

@@ -5,6 +5,7 @@ import tempfile
 import numpy as np
 import pandas as pd
 import sys
+import argparse
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
@@ -59,10 +60,11 @@ def concat_feat_label_after_transform(X_pre, y_pre):
     logger.info("concatenating features and label after transformation")
     return np.concatenate((y_pre, X_pre), axis=1)
     
-def train_val_test_split(X):
+def train_val_test_split(X, val_test_split):
     np.random.shuffle(X)
     logger.info('splitting data into train/val/test')
-    train, validation, test = np.split(X, [int(.7*len(X)), int(.85*len(X))])
+    train_split = 1- (2*val_test_split) 
+    train, validation, test = np.split(X, [int(train_split*len(X)), int((1-val_test_split)*len(X))])
     train_val_test_dict = {"train":train, "validation": validation, "test":test}
     return train_val_test_dict
 
@@ -70,19 +72,18 @@ def train_val_test_split(X):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-
     # Sagemaker specific arguments. Defaults are set in the environment variables.
-    parser.add_argument('--output-data-dir', type=str, default=os.environ['SM_OUTPUT_DATA_DIR'])
-    parser.add_argument('--model-dir', type=str, default=os.environ['SM_MODEL_DIR'])
-    parser.add_argument('--train', type=str, default=os.environ['SM_CHANNEL_TRAIN'])
+    parser.add_argument('--input-data-path', type=str, default="/opt/ml/processing/input/abalone-dataset.csv")
+    parser.add_argument('--train-val-test-dir', type=str, default="/opt/ml/processing")
+    parser.add_argument('--val-test-split', type=float, default=0.15)
 
     args = parser.parse_args()
     
-    df = read_data_from_csv()
+    df = read_data_from_csv(args.input_data_path)
     X_pre = preprocess_pipeline(df)
     y_pre = reshape_label_col(df)   
     X = concat_feat_label_after_transform(X_pre, y_pre)
     
-    train_val_test_dict = train_val_test_split(X)
-    save_output_to_csv(**train_val_test_dict):
+    train_val_test_dict = train_val_test_split(X, args.val_test_split)
+    save_output_to_csv(args.train_val_test_dir, **train_val_test_dict):
     
