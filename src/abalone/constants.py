@@ -1,4 +1,5 @@
 import numpy as np
+import os
 
 NUMERIC_COLS = [
     "length",
@@ -25,4 +26,16 @@ FEATURE_COLS_DTYPE= {
 }
 LABEL_DTYPE = {"rings": np.float64}
 
-BASE_DIR = "data/abalone"
+INPUT_DATA_DIR = "/opt/ml/processing/input"
+TRAIN_DIR = "/opt/ml/processing/train"
+TEST_DIR = "/opt/ml/processing/test"
+
+
+HP={ "max_depth":"5",
+    "eta":"0.2",
+    "gamma":"4",
+    "min_child_weight":"6",
+    "subsample":"0.7",
+    "objective":"reg:squarederror",
+    "num_round":"50"
+   }

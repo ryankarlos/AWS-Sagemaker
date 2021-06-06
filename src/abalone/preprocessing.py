@@ -9,7 +9,7 @@ from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
-
+from sagemaker.sklearn.estimator import SKLearn
 from src.abalone.constants import  *
 from src.abalone.io import read_data_from_csv, save_output_to_csv
 import logging
@@ -66,8 +66,17 @@ def train_val_test_split(X):
     train_val_test_dict = {"train":train, "validation": validation, "test":test}
     return train_val_test_dict
 
-    
+
+
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+
+    # Sagemaker specific arguments. Defaults are set in the environment variables.
+    parser.add_argument('--output-data-dir', type=str, default=os.environ['SM_OUTPUT_DATA_DIR'])
+    parser.add_argument('--model-dir', type=str, default=os.environ['SM_MODEL_DIR'])
+    parser.add_argument('--train', type=str, default=os.environ['SM_CHANNEL_TRAIN'])
+
+    args = parser.parse_args()
     
     df = read_data_from_csv()
     X_pre = preprocess_pipeline(df)
@@ -75,5 +84,5 @@ if __name__ == "__main__":
     X = concat_feat_label_after_transform(X_pre, y_pre)
     
     train_val_test_dict = train_val_test_split(X)
-    save_output_to_csv(**train_val_test_dict)
+    save_output_to_csv(**train_val_test_dict):
     
