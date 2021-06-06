@@ -4,21 +4,23 @@ import requests
 import tempfile
 import numpy as np
 import pandas as pd
-
+import sys
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 
-from .constants import  *
-from .io import read_data_from_csv, save_output_to_csv
+from src.abalone.constants import  *
+from src.abalone.io import read_data_from_csv, save_output_to_csv
+import logging
 
+logger = logging.getLogger(os.path.basename(__file__))
+logger.setLevel(logging.INFO)
 
-
-def merge_two_dicts(x, y):
-    z = x.copy()
-    z.update(y)
-    return z
+ch = logging.StreamHandler(sys.stdout)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+logger.addHandler(ch)
 
 
 def numerical_transformer():
@@ -54,10 +56,12 @@ def reshape_label_col(df):
     
 
 def concat_feat_label_after_transform(X_pre, y_pre):
+    logger.info("concatenating features and label after transformation")
     return np.concatenate((y_pre, X_pre), axis=1)
     
 def train_val_test_split(X):
     np.random.shuffle(X)
+    logger.info('splitting data into train/val/test')
     train, validation, test = np.split(X, [int(.7*len(X)), int(.85*len(X))])
     train_val_test_dict = {"train":train, "validation": validation, "test":test}
     return train_val_test_dict

@@ -1,3 +1,4 @@
+import numpy as np
 
 NUMERIC_COLS = [
     "length",
@@ -24,4 +25,4 @@ FEATURE_COLS_DTYPE= {
 }
 LABEL_DTYPE = {"rings": np.float64}
 
-BASE_DIR = "../data"
+BASE_DIR = "data/abalone"
