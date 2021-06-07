@@ -6,14 +6,19 @@ import numpy as np
 import pandas as pd
 import sys
 import argparse
+
+import logging
+import numpy as np
+import os
+import pandas as pd
+import sys
+import warnings
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
+warnings.simplefilter("ignore", category=DeprecationWarning)
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
-from sagemaker.sklearn.estimator import SKLearn
-from src.abalone.constants import  *
-from src.abalone.io import read_data_from_csv, save_output_to_csv
-import logging
+
 
 logger = logging.getLogger(os.path.basename(__file__))
 logger.setLevel(logging.INFO)
@@ -23,6 +28,60 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 ch.setFormatter(formatter)
 logger.addHandler(ch)
 
+
+NUMERIC_COLS = [
+    "length",
+    "diameter",
+    "height",
+    "whole_weight",
+    "shucked_weight",
+    "viscera_weight",
+    "shell_weight",
+]
+
+CAT_COLS = ["sex"]
+LABEL = "rings"
+
+FEATURE_COLS_DTYPE= {
+    "sex": str,
+    "length": np.float64,
+    "diameter": np.float64,
+    "height": np.float64,
+    "whole_weight": np.float64,
+    "shucked_weight": np.float64,
+    "viscera_weight": np.float64,
+    "shell_weight": np.float64
+}
+LABEL_DTYPE = {"rings": np.float64}
+
+
+
+def merge_two_dicts(x, y):
+    z = x.copy()
+    z.update(y)
+    return z
+
+
+def read_data_from_csv(filepath):
+    names = CAT_COLS + NUMERIC_COLS + [LABEL]
+    logger.info(f"setting header names as: {names}")
+    df = pd.read_csv(filepath,
+        header=None, 
+        names=names,
+        dtype=merge_two_dicts(FEATURE_COLS_DTYPE, LABEL_DTYPE)
+    )
+    
+    return df
+
+
+def save_output_to_csv(base_dir, **kwargs):
+    for k,v in kwargs.items():
+        par_dir = os.path.join(base_dir, k)
+        if not os.path.exists(par_dir):
+            logger.info('Train/Val/Test dirs do not exist so creating them')
+            os.makedirs(par_dir)           
+        pd.DataFrame(v).to_csv(os.path.join(par_dir, f"{k}.csv"), header=False, index=False)
+        
 
 def numerical_transformer():
     return Pipeline(
@@ -85,5 +144,5 @@ if __name__ == "__main__":
     X = concat_feat_label_after_transform(X_pre, y_pre)
     
     train_val_test_dict = train_val_test_split(X, args.val_test_split)
-    save_output_to_csv(args.train_val_test_dir, **train_val_test_dict):
+    save_output_to_csv(args.train_val_test_dir, **train_val_test_dict)
     
