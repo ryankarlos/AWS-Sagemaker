@@ -75,10 +75,10 @@ def batch_inference_job(estimator, bucket_prefix="abalone"):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--endpoint', type=str, default=None)
-    parser.add_argument('--payload', type=str, default='0.44, 0.365, 0.125, 0.516, 0.2155, 0.114, 0.155, 1, 0, 0')
+    parser.add_argument('--payload', type=str, default='0.3415, 0.4244, 0.1311, 0.04233, 0.2799, -0.110342, -0.099, 1.0, 0, 0')
     args = parser.parse_args()
-    
-    logger.info(f"starting runner ...{sys.argv[0]}")
+
+    logger.info(f"starting runner {sys.argv[0]} ....")
     logger.info(sys.argv[1:])
 
     
