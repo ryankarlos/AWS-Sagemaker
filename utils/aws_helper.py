@@ -20,3 +20,18 @@ def upload_dataset_to_s3(default_bucket, local_path):
     print(input_data_uri)
     
 
+
+def get_image_uri(framework, region, version):
+    """
+    Retrieves docker image uri from registry. e.g framework "sklearn", region "us-east-1", version "0.23-1"
+    """
+    return sagemaker.image_uris.retrieve(framework, region, version)
+
+    
+def get_pre_trained_model_from_bucket(model_uri, role, framework, region, version):
+    """
+    Returns a sagemaker model from s3 uri which can be deployed to an endpoint
+    """
+    
+    return sagemaker.model.Model(model_data=model_uri, image_uri=get_image_uri(framework, region, version), role=role)  
+    

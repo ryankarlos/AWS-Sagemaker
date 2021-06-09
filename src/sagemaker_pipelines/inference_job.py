@@ -1,8 +1,8 @@
 import boto3
 from sagemaker.serializers import CSVSerializer
-from sagemaker.predictor import (json_serializer, csv_serializer, 
-                                 json_deserializer, RealTimePredictor)
+from sagemaker.predictor import Predictor
 from utils.sagemaker_config import *
+from utils.aws_helper import get_pre_trained_model_from_bucket
 import logging
 import os
 import sys
@@ -18,11 +18,13 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 
+
+
 def deploy_model(estimator):
     
     predictor=estimator.deploy(
-    initial_instance_count=1,
-    instance_type='ml.t2.medium',
+    initial_instance_count=INSTANCE_CONFIG['inference_instance_count'],
+    instance_type=INSTANCE_CONFIG['inference_instance_type'],
     serializer=CSVSerializer()
     )
     
@@ -30,14 +32,16 @@ def deploy_model(estimator):
 
 
 def real_time_inference_job(endpoint_name):
-    predictor = RealTimePredictor(
-        endpoint=endpoint_name,
-        sagemaker_session=sagemaker_session,
-        serializer=csv_serializer,
-        content_type="text/csv",
-        accept="application/json")
+    predictor = Predictor(
+        endpoint_name=endpoint_name,
+        sagemaker_session=SAGEMAKER_SESSION,
+        serializer=CSVSerializer()
+    )
+    
+    logger.info(f"Endpoint context for {endpoint_name}: {predictor.endpoint_context()}\n")
     
     return predictor
+    
     
     
 def batch_inference_job(estimator, bucket_prefix="abalone"):
@@ -51,8 +55,8 @@ def batch_inference_job(estimator, bucket_prefix="abalone"):
     logger.info(f"Starting batch inference job-input path:{batch_input}, output path:{batch_output}")
     
     transformer = estimator.transformer(
-    instance_count=1, 
-    instance_type='ml.m4.xlarge', 
+    instance_count=INSTANCE_CONFIG['inference_instance_count'], 
+    instance_type=INSTANCE_CONFIG['batch_transform_instance_type'],
     output_path=batch_output
     )
     
@@ -71,17 +75,27 @@ def batch_inference_job(estimator, bucket_prefix="abalone"):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--endpoint', type=str, default=None)
+    parser.add_argument('--payload', type=str, default='0.44, 0.365, 0.125, 0.516, 0.2155, 0.114, 0.155, 1, 0, 0')
     args = parser.parse_args()
     
-    if args.endpoint is not None:
-        predictor = deploy_model(xgb_fitted)
+    logger.info(f"starting runner ...{sys.argv[0]}")
+    logger.info(sys.argv[1:])
+
+    
+    if args.endpoint is None:
+        try:
+            model_uri = os.environ['MODEL_URI']
+        except:
+            logger.error("endpoint not specified in command line args so env var MODEL_URI must be specified")
+        estimator = get_pre_trained_model_from_bucket(model_uri, ROLE, IMAGE_METADATA["framework"], IMAGE_METADATA["region"], IMAGE_METADATA["version"])
+    
+        predictor = deploy_model(estimator)
         endpoint = predictor.endpoint_name
         logger.info(f"Model served by endpoint: {endpoint}")
     else:
         endpoint = args.endpoint
     predictor = real_time_inference_job(endpoint)
-    payload = 'M, 0.44, 0.365, 0.125, 0.516, 0.2155, 0.114, 0.155'
-    logger.info(f"Prediction returned for payload {payload}: {predictor.predict(payload)}")
+    logger.info(f"Prediction returned: {predictor.predict(args.payload)}")
 
 
 

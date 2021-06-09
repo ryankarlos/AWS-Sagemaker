@@ -52,7 +52,7 @@ def estimator_fit_job(func, ts, hp_ranges):
                                 objective_metric_name="validation:rmse",
                                 objective_type='Minimize',
                                 hyperparameter_ranges=hp_ranges,
-                                max_jobs=2, max_parallel_jobs=2)
+                                max_jobs=12, max_parallel_jobs=5)  # need to adjust this based on max allowed instances for chosen type
     
     tuner.fit({'train': train_input, 'validation': validation_input}, logs=True)
 
