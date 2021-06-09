@@ -85,8 +85,9 @@ if __name__ == "__main__":
     if args.endpoint is None:
         try:
             model_uri = os.environ['MODEL_URI']
-        except:
+        except KeyError:
             logger.error("endpoint not specified in command line args so env var MODEL_URI must be specified")
+            raise
         estimator = get_pre_trained_model_from_bucket(model_uri, ROLE, IMAGE_METADATA["framework"], IMAGE_METADATA["region"], IMAGE_METADATA["version"])
     
         predictor = deploy_model(estimator)
