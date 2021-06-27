@@ -3,12 +3,25 @@ import sagemaker
 import sagemaker.session
 
 
-def get_sagemaker_session():
-    region = boto3.Session().region_name
-    sagemaker_session = sagemaker.session.Session()
-    role = sagemaker.get_execution_role()
-    default_bucket = sagemaker_session.default_bucket()
-    return default_bucket, role, region, sagemaker_session
+def get_session(region, default_bucket):
+    """Gets the sagemaker session based on the region.
+    Args:
+        region: the aws region to start the session
+        default_bucket: the bucket to use for storing the artifacts
+    Returns:
+        `sagemaker.session.Session instance
+    """
+
+    boto_session = boto3.Session(region_name=region)
+
+    sagemaker_client = boto_session.client("sagemaker")
+    runtime_client = boto_session.client("sagemaker-runtime")
+    return sagemaker.session.Session(
+        boto_session=boto_session,
+        sagemaker_client=sagemaker_client,
+        sagemaker_runtime_client=runtime_client,
+        default_bucket=default_bucket,
+    )
 
     
 def upload_dataset_to_s3(default_bucket, local_path):
@@ -21,11 +34,19 @@ def upload_dataset_to_s3(default_bucket, local_path):
     
 
 
-def get_image_uri(framework, region, version):
+def get_image_uri(framework, region, version, py_version, training_instance_type):
     """
     Retrieves docker image uri from registry. e.g framework "sklearn", region "us-east-1", version "0.23-1"
     """
-    return sagemaker.image_uris.retrieve(framework, region, version)
+    return sagemaker.image_uris.retrieve(framework, region, version, py_version, training_instance_type)
+
+    return sagemaker.image_uris.retrieve(
+        framework="xgboost",  # we are using the Sagemaker built in xgboost algorithm
+        region=region,
+        version="1.0-1",
+        py_version="py3",
+        instance_type=training_instance_type,
+    )
 
     
 def get_pre_trained_model_from_bucket(model_uri, role, framework, region, version):
