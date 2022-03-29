@@ -6,7 +6,7 @@ authors = ["Ryan Nazareth <ryankarlos@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "3.9.1"
-poetry = "^1.1.6"
+poetry = "^1.1.9"
 pandas = "^1.2.4"
 boto3 = "^1.17.84"
 sagemaker = "^2.43.0"
