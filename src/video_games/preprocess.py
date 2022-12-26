@@ -67,4 +67,4 @@ if __name__ == "__main__":
     visualise_target_imbalance(df)
     model_data = preprocess_data(df)
     train_data, validation_data, test_data = train_test_split(model_data)
-    #upload_model_data_to_s3()
+    upload_model_data_to_s3()
