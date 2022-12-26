@@ -6,20 +6,20 @@ from sagemaker_config import SESS, ROLE
 from sagemaker.huggingface.model import HuggingFaceModel
 
 
-def download_model_from_s3(estimator):
-    S3Downloader.download(
-        s3_uri=estimator.model_data,
-        local_path='.',                          # local path where *.targ.gz is saved
-        sagemaker_session=SESS                   # SageMaker session used for training the model
-    )
-
-
 logger = logging.getLogger(os.path.basename(__file__))
 logger.setLevel(logging.INFO)
 ch = logging.StreamHandler(sys.stdout)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 ch.setFormatter(formatter)
 logger.addHandler(ch)
+
+
+def download_model_from_s3(estimator):
+    S3Downloader.download(
+        s3_uri=estimator.model_data,
+        local_path='.',                          # local path where *.targ.gz is saved
+        sagemaker_session=SESS                   # SageMaker session used for training the model
+    )
 
 
 def deploy_model(estimator):

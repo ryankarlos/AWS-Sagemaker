@@ -3,6 +3,12 @@ import sagemaker
 from enum import Enum
 
 
+S3_BUCKET = "sagemaker_experiments"
+S3_PREFIX_VIDEOGAMES = "videogames"
+S3_PREFIX_IMDB = "imdb"
+VIDEOGAME_ENDPOINT_NAME = "videogames"
+
+
 class InstanceConfig(Enum):
     PROCESSING = "ml.m5.xlarge"
     TRAINING = "ml.p3.2xlarge"

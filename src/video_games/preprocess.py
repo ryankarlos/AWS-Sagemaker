@@ -1,16 +1,19 @@
-from sklearn.datasets import dump_svmlight_file
 import boto3
 import pandas as pd
+import os
 import numpy as np
 import matplotlib.pyplot as plt
+from src.utils import get_repo_root
+from sagemaker_config import S3_BUCKET, S3_PREFIX_VIDEOGAMES
 
-bucket = 'sagemaker-artifacts'
-prefix = 'videogames_xgboost'
+
+basepath = get_repo_root(__file__)
+data_dir = os.path.join(basepath, 'data/video_games')
 
 
 def download_data_from_s3():
     raw_data_filename = 'Video_Games_Sales_as_at_22_Dec_2016.csv'
-    local_dest_path = "'data/video_games/raw_data.csv'"
+    local_dest_path = os.path.join(data_dir, 'raw_data.csv')
     data_bucket = 'sagemaker-workshop-pdx'
     s3 = boto3.resource('s3')
     s3.Bucket(data_bucket).download_file(raw_data_filename, local_dest_path)
@@ -45,25 +48,23 @@ def preprocess_data(df):
 def train_test_split(df):
     model_data = df.copy()
     train_data, validation_data, test_data = np.split(model_data.sample(frac=1, random_state=1729),
-                                                      [int(0.7 * len(model_data)), int(0.9 * len(model_data))])
+                                                      [int(0.8 * len(model_data)), int(0.995 * len(model_data))])
     return train_data, validation_data, test_data
 
 
-def convert_data_to_libsvm(train_data, validation_data, test_data):
-    dump_svmlight_file(X=train_data.drop(['y_no', 'y_yes'], axis=1), y=train_data['y_yes'], f='data/video_games/train.libsvm')
-    dump_svmlight_file(X=validation_data.drop(['y_no', 'y_yes'], axis=1), y=validation_data['y_yes'], f='data/video_games/validation.libsvm')
-    dump_svmlight_file(X=test_data.drop(['y_no', 'y_yes'], axis=1), y=test_data['y_yes'], f='data/video_games/test.libsvm')
-
-
 def upload_model_data_to_s3():
-    boto3.Session().resource('s3').Bucket(bucket).Object(prefix + '/train/train.libsvm').upload_file('data/video_games/train.libsvm')
-    boto3.Session().resource('s3').Bucket(bucket).Object(prefix + '/validation/validation.libsvm').upload_file('data/video_games/validation.libsvm')
+    boto3.Session().resource("s3").Bucket(S3_BUCKET).Object(
+        os.path.join(S3_PREFIX_VIDEOGAMES, "train/train.csv")
+    ).upload_file("train.csv")
+    boto3.Session().resource("s3").Bucket(S3_BUCKET).Object(
+        os.path.join(S3_PREFIX_VIDEOGAMES, "validation/validation.csv")
+    ).upload_file("validation.csv")
 
 
 if __name__ == "__main__":
     df = download_data_from_s3()
+    print(df)
     visualise_target_imbalance(df)
     model_data = preprocess_data(df)
     train_data, validation_data, test_data = train_test_split(model_data)
-    convert_data_to_libsvm(train_data, validation_data, test_data)
-    upload_model_data_to_s3()
+    #upload_model_data_to_s3()

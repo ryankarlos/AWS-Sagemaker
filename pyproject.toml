@@ -5,7 +5,7 @@ description = "List of practical example on AWS Sagemaker"
 authors = ["Ryan Nazareth <ryankarlos@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "3.9.12"
+python = "^3.9.0"
 poetry = "^1.1.6"
 pandas = "^1.5.2"
 sagemaker = "^2.126.0"

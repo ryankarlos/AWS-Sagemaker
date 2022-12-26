@@ -3,8 +3,7 @@ import os
 import sys
 from sagemaker.huggingface import HuggingFace
 from sagemaker_config import ROLE, Hyperparameters, InstanceConfig
-from .preprocess import *
-
+from preprocess import get_bucket_paths
 
 logger = logging.getLogger(os.path.basename(__file__))
 logger.setLevel(logging.INFO)
@@ -16,7 +15,7 @@ logger.addHandler(ch)
 
 def create_hugging_face_estimator(distributed_training=False):
     hyperparameters = {
-        "epochs": Hyperparameters.EPOCHS.va,  # number of training epochs
+        "epochs": Hyperparameters.EPOCHS.value,  # number of training epochs
         "train_batch_size": Hyperparameters.BATCH_SIZE.value
         ,  # training batch size
         "model_name": Hyperparameters.MODEL_NAME.value  # name of pretrained model
@@ -46,11 +45,11 @@ def create_hugging_face_estimator(distributed_training=False):
     return huggingface_estimator
 
 
-def train_estimator(huggingface_estimator, bucket_name):
-    training_input_path, test_input_path = get_bucket_paths(bucket_name)
+def train_estimator(huggingface_estimator):
+    training_input_path, test_input_path = get_bucket_paths()
     huggingface_estimator.fit({"train": training_input_path, "test": test_input_path})
 
 
 if __name__ == "__main__":
     estimator = create_hugging_face_estimator()
-    train_estimator(estimator, "sagemaker_artifacts")
+    train_estimator(estimator)

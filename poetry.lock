@@ -1500,7 +1500,11 @@ files = [
 ]
 
 [package.dependencies]
-numpy = {version = ">=1.20.3", markers = "python_version < \"3.10\""}
+numpy = [
+    {version = ">=1.20.3", markers = "python_version < \"3.10\""},
+    {version = ">=1.21.0", markers = "python_version >= \"3.10\""},
+    {version = ">=1.23.2", markers = "python_version >= \"3.11\""},
+]
 python-dateutil = ">=2.8.1"
 pytz = ">=2020.1"
 
@@ -3007,5 +3011,5 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 
 [metadata]
 lock-version = "2.0"
-python-versions = "3.9.12"
-content-hash = "5544313d09279dc2f284dc543b8f3116d24287d157e7f802d7931764b1f6bd65"
+python-versions = "^3.9.0"
+content-hash = "9fd5084fc7767cd8692b35d4a0789bfeff7859c969984758adc2a5167c9ea922"
