@@ -2,7 +2,7 @@ import logging
 import os
 import sys
 from sagemaker.huggingface import HuggingFace
-from sagemaker_config import ROLE, Hyperparameters, InstanceConfig
+from sagemaker_config import ROLE_NAME, Hyperparameters, InstanceConfig, HUGGING_FACE_URI
 from preprocess import get_bucket_paths
 
 logger = logging.getLogger(os.path.basename(__file__))
@@ -31,10 +31,9 @@ def create_hugging_face_estimator(distributed_training=False):
         source_dir="./scripts",  # directory where fine-tuning script is stored
         instance_type=InstanceConfig.TRAINING.value,  # instance type
         instance_count=1,  # number of instances
-        role=ROLE,  # IAM role used in training job to acccess AWS resources (S3)
-        transformers_version="4.6",  # Transformers version
-        pytorch_version="1.7",  # PyTorch version
-        py_version="py39",  # Python version
+        role=ROLE_NAME,  # IAM role used in training job to acccess AWS resources (S3)
+        image_uri=HUGGING_FACE_URI,
+        py_version="py38",  # Python version
         metric_definitions=metric_definitions,
         hyperparameters=hyperparameters  # hyperparameters to use in training job
     )
@@ -51,5 +50,7 @@ def train_estimator(huggingface_estimator):
 
 
 if __name__ == "__main__":
+    print(HUGGING_FACE_URI)
     estimator = create_hugging_face_estimator()
+    print(estimator)
     train_estimator(estimator)
