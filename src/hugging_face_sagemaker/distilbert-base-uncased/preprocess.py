@@ -40,4 +40,6 @@ if __name__ == "__main__":
     # load dataset
     train_dataset, test_dataset = load_dataset("imdb", split=["train", "test"])
     train, test = set_dataset_format_for_pytorch(train_dataset, test_dataset)
-    #upload_to_s3(train, test)
+    print(train)
+    print(test)
+    upload_to_s3(train, test)

@@ -2,7 +2,7 @@ import logging
 import os
 import sys
 from sagemaker.s3 import S3Downloader
-from sagemaker_config import SESS, ROLE
+from sagemaker_config import SESS, ROLE_NAME, HUGGING_FACE_URI, InstanceConfig, delete_endpoint
 from sagemaker.huggingface.model import HuggingFaceModel
 
 
@@ -25,15 +25,16 @@ def download_model_from_s3(estimator):
 def deploy_model(estimator):
     huggingface_model = HuggingFaceModel(
         model_data=estimator.model_data,  # path to your trained SageMaker model
-        role=ROLE,  # IAM role with permissions to create an endpoint
+        role=ROLE_NAME,  # IAM role with permissions to create an endpoint
         transformers_version="4.6",  # Transformers version used
+        image_uri=HUGGING_FACE_URI,
         pytorch_version="1.7",  # PyTorch version used
-        py_version='py36',  # Python version used
+        py_version='py38',  # Python version used
     )
     # deploy model to SageMaker Inference
     predictor = huggingface_model.deploy(
         initial_instance_count=1,
-        instance_type="ml.m5.xlarge"
+        instance_type=InstanceConfig.INFERENCE.value
     )
     return predictor
 
@@ -49,3 +50,4 @@ if __name__ == "__main__":
                   "No fan is going to watch and feel short-changed."}
 
     generate_prediction(input_text, predictor)
+    delete_endpoint(predictor)
