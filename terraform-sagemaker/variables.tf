@@ -17,7 +17,7 @@ variable "notebook_repo" {
 
 
 locals {
-  data_bucket_name    = "sagemaker-experiments"
+  data_bucket_name    = "sagemaker-experiments-ml"
   backend_bucket_name = "terraform-scripts-state"
   backend_bucket_key  = "sagemaker.tfstate"
   region              = "us-east-1"

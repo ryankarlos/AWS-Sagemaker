@@ -20,7 +20,7 @@ def create_xgboost_estimator():
     # construct a SageMaker estimator that calls the xgboost-container
     estimator = sagemaker.estimator.Estimator(image_uri=xgboost_container,
                                               hyperparameters=hyperparameters,
-                                              role=sagemaker.get_execution_role(),
+                                              role=get_role(),
                                               instance_count=1,
                                               instance_type='ml.m5.2xlarge',
                                               volume_size=5,  # 5 GB
@@ -38,14 +38,17 @@ def train_estimator(estimator):
     estimator.fit({'train': train_input, 'validation': validation_input})
 
 
-if __name__ == "__main__":
-    estimator = create_xgboost_estimator()
-    train_estimator(estimator)
-
+def deploy_endpoint(estimator):
     serializer = CSVSerializer()
-    predictor = estimator.deploy(
+    estimator.deploy(
         initial_instance_count=1,
         endpoint_name=VIDEOGAME_ENDPOINT_NAME,
         instance_type="ml.m5.xlarge",
         serializer=serializer,
     )
+
+
+if __name__ == "__main__":
+    estimator = create_xgboost_estimator()
+    train_estimator(estimator)
+    deploy_endpoint(estimator)

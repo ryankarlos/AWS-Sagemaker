@@ -2,7 +2,9 @@ data "aws_iam_policy_document" "foo" {
   statement {
     effect = "Allow"
     actions = [
-      "sagemaker:*"
+      "sagemaker:*",
+      "iam:GetRole",
+      "iam:PassRole"
     ]
     resources = [
       "*"
@@ -14,6 +16,7 @@ data "aws_iam_policy_document" "foo" {
       "cloudwatch:PutMetricData",
       "logs:CreateLogStream",
       "logs:PutLogEvents",
+      "logs:GetLogEvents",
       "logs:CreateLogGroup",
       "logs:DescribeLogStreams",
       "ecr:GetAuthorizationToken",
@@ -60,4 +63,11 @@ resource "aws_iam_role" "sm_role" {
       },
     ]
   })
+}
+
+
+resource "aws_iam_policy_attachment" "sm-attach" {
+  name       = "sm-role-policy"
+  roles      = ["${aws_iam_role.sm_role.name}"]
+  policy_arn = "${aws_iam_policy.foo.arn}"
 }

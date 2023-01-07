@@ -1,13 +1,14 @@
 import sagemaker.session
 import sagemaker
 from enum import Enum
+import boto3
+from sagemaker.predictor import Predictor
 
-
-S3_BUCKET = "sagemaker_experiments"
+S3_BUCKET = "sagemaker-experiments-ml"
 S3_PREFIX_VIDEOGAMES = "videogames"
 S3_PREFIX_IMDB = "imdb"
 VIDEOGAME_ENDPOINT_NAME = "videogames"
-
+ROLE = "sagemaker-experiments-ml-role"
 
 class InstanceConfig(Enum):
     PROCESSING = "ml.m5.xlarge"
@@ -21,14 +22,25 @@ class Hyperparameters(Enum):
     MODEL_NAME = "distilbert-base-uncased"
 
 
-def get_session(sagemaker_session_bucket):
-    role = sagemaker.get_execution_role()
-    sess = sagemaker.Session(default_bucket=sagemaker_session_bucket)
-    return role, sess
+def get_session():
+    sess = sagemaker.Session(default_bucket=S3_BUCKET)
+    return sess
 
 
-def delete_endpoint(predictor):
-    predictor.delete_endpoint()
+def get_role():
+    iam_client = boto3.client('iam')
+    role_arn = iam_client.get_role(RoleName=ROLE)['Role']['Arn']
+    return role_arn
 
 
-ROLE, SESS = get_session("sagemaker_artifact")
+def delete_endpoint(*endpoints):
+    for name in endpoints:
+        predictor = Predictor(endpoint_name=name, sagemaker_session=get_session())
+        predictor.delete_endpoint()
+
+
+ROLE_ARN = get_role()
+
+if __name__ == "__main__":
+    print(ROLE_ARN)
+    #delete_endpoint([VIDEOGAME_ENDPOINT_NAME])
