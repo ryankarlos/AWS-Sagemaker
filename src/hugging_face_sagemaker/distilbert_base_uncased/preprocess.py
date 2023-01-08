@@ -14,7 +14,7 @@ def set_dataset_format_for_pytorch(train, test):
     # tokenize train and test datasets
     train_dataset = train.map(tokenize, batched=True)
     test_dataset = test.map(tokenize, batched=True)
-    train_dataset =  train_dataset.rename_column("label", "labels")
+    train_dataset = train_dataset.rename_column("label", "labels")
     train_dataset.set_format("torch", columns=["input_ids", "attention_mask", "labels"])
     test_dataset = test_dataset.rename_column("label", "labels")
     test_dataset.set_format("torch", columns=["input_ids", "attention_mask", "labels"])
@@ -22,8 +22,8 @@ def set_dataset_format_for_pytorch(train, test):
 
 
 def get_bucket_paths():
-    training_input_path = f's3://{S3_BUCKET}/{S3_PREFIX_IMDB}/train'
-    test_input_path = f's3://{S3_BUCKET}/{S3_PREFIX_IMDB}/test'
+    training_input_path = f"s3://{S3_BUCKET}/{S3_PREFIX_IMDB}/train"
+    test_input_path = f"s3://{S3_BUCKET}/{S3_PREFIX_IMDB}/test"
     return training_input_path, test_input_path
 
 

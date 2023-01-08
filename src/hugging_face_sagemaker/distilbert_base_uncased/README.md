@@ -1,14 +1,14 @@
 ### Hugging Face on Sagemaker
 
-This section follows the steps in the tutorial on the Hugging Face docs to 
+This section follows the steps in the tutorial on the Hugging Face docs to
 run preprocessing, training and inference jobs.
 https://huggingface.co/docs/sagemaker/train#run-training-on-amazon-sagemaker
 
 ### Sagemaker roles
 
-If you have created Sagemaker roles previosuly, you can list 
+If you have created Sagemaker roles previosuly, you can list
 them out on the console, filtering the output for roles with sagemaker service
-principal in assumed role policy. 
+principal in assumed role policy.
 In my case, I have roles created for SagemakerNotebook and Sagemaker Main Role
 
 ```
@@ -25,16 +25,16 @@ To get more details on the attached policies for the SagemakerMainRole.
 ![](../../../screenshots/get_role_details.png)
 
 
-### Running the steps 
+### Running the steps
 
-Run the preprocess.py script to download and preprocess  (tokenise) the IMDB 
+Run the preprocess.py script to download and preprocess  (tokenise) the IMDB
 dataset for training.
 This also uploads the preprocessed dataset to the S3 BUCKET.
 
 ![](../../../screenshots/hugging-face-preprocessing.png)
 
 
-The training_job.py script creates a Hugging Face Estimator to handle end-to-end SageMaker 
+The training_job.py script creates a Hugging Face Estimator to handle end-to-end SageMaker
 training. This uses a finetuning script in the scripts/train.py which is taken from
 https://github.com/huggingface/notebooks/blob/main/sagemaker/01_getting_started_pytorch/scripts/train.py
 
@@ -50,9 +50,8 @@ aws sagemaker list-training-jobs --query 'TrainingJobSummaries[?CreationTime>`20
 
 
 Once the training job is complete, the model should be persisted to S3. Run the `predict.py` script to downaload
-the fine-tuned model from S3 and deploy to a Sagemaker endpoint by providing the name of the instance type and 
-number of instances to run the endpoint. 
+the fine-tuned model from S3 and deploy to a Sagemaker endpoint by providing the name of the instance type and
+number of instances to run the endpoint.
 
 The script also sends an example request to the endpoint for generating a prediction.
 Finally, the endpoint is deleted by calling `predictor.delete_endpoint(<Endpoint-Name>)`
-
