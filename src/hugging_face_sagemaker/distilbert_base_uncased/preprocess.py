@@ -6,7 +6,7 @@ from sagemaker_config import S3_BUCKET, S3_PREFIX_IMDB
 
 def tokenize(batch):
     # load tokenizer
-    tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
+    tokenizer = AutoTokenizer.from_pretrained("distilbert_base_uncased")
     return tokenizer(batch["text"], padding="max_length", truncation=True)
 
 

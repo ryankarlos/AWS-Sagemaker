@@ -22,7 +22,7 @@ class InstanceConfig(Enum):
 class Hyperparameters(Enum):
     EPOCHS = 1
     BATCH_SIZE = 32
-    MODEL_NAME = "distilbert-base-uncased"
+    MODEL_NAME = "bert-base-uncased"
 
 
 def get_session():
@@ -30,9 +30,9 @@ def get_session():
     return sess
 
 
-def get_role():
+def get_role(role_name):
     iam_client = boto3.client('iam')
-    role_arn = iam_client.get_role(RoleName=ROLE)['Role']['Arn']
+    role_arn = iam_client.get_role(RoleName=role_name)['Role']['Arn']
     return role_arn
 
 
@@ -42,7 +42,7 @@ def delete_endpoint(*endpoints):
         predictor.delete_endpoint()
 
 
-ROLE_ARN = get_role()
+ROLE_ARN = get_role(ROLE_NAME)
 SESS = get_session()
 
 if __name__ == "__main__":
