@@ -10,6 +10,7 @@ import logging
 import sys
 import argparse
 import os
+import math
 from src.hugging_face_sagemaker.distilbert_base_uncased.preprocess import (
     get_bucket_paths,
 )
@@ -31,6 +32,8 @@ def base_command_line_args():
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--epochs", type=int, default=1)
+    parser.add_argument("--train_samples", type=int, default=10000)
+    parser.add_argument("--test_samples", type=int, default=3000)
     parser.add_argument("--train_batch_size", type=int, default=32)
     parser.add_argument("--eval_batch_size", type=int, default=64)
     parser.add_argument("--warmup_steps", type=int, default=500)
@@ -43,9 +46,9 @@ def base_command_line_args():
 def addition_command_args(parser, mode=None):
     if mode == "local":
         training_dir, test_dir = get_bucket_paths()
-        os.environ["SM_OUTPUT_DATA_DIR"] = "."
-        os.environ["SM_MODEL_DIR"] = "."
-        os.environ["SM_NUM_GPUS"] = "0"
+        os.environ["SM_OUTPUT_DATA_DIR"] = "./output/"
+        os.environ["SM_MODEL_DIR"] = "./model/"
+        os.environ["SM_NUM_GPUS"] = "1"
         os.environ["SM_CHANNEL_TRAIN"] = training_dir
         os.environ["SM_CHANNEL_TEST"] = test_dir
     parser.add_argument(
@@ -101,6 +104,31 @@ def compute_metrics(pred):
     return {"accuracy": acc, "f1": f1, "precision": precision, "recall": recall}
 
 
+def load_from_s3_into_pytorch_datset(num_train_samples, num_test_samples, fs=None):
+    if fs is not None:
+        train_dataset = load_from_disk(args.training_dir, fs=fs)
+        test_dataset = load_from_disk(args.test_dir, fs=fs)
+    else:
+        train_dataset = load_from_disk(args.training_dir)
+        test_dataset = load_from_disk(args.test_dir)
+    filtered_train_dataset = preprocess_pytorch_dataset(
+        train_dataset, num_train_samples
+    )
+    filtered_test_dataset = preprocess_pytorch_dataset(test_dataset, num_test_samples)
+    return filtered_train_dataset, filtered_test_dataset
+
+
+def preprocess_pytorch_dataset(dataset, num_samples):
+    """Shuffle and filter dataset samples"""
+
+    skip_examples = math.ceil(len(dataset) / num_samples)
+    print(skip_examples)
+    filtered_dataset = dataset.shuffle(seed=42).filter(
+        lambda example, indice: indice % skip_examples == 0, with_indices=True
+    )
+    return filtered_dataset
+
+
 if __name__ == "__main__":
     parser = base_command_line_args()
     args, _ = parser.parse_known_args()
@@ -113,13 +141,21 @@ if __name__ == "__main__":
         # create S3FileSystem without credentials
         s3 = S3FileSystem(key=aws_access_key_id, secret=aws_secret_access_key)
         # load datasets
-        train_dataset = load_from_disk(args.training_dir, fs=s3)
-        test_dataset = load_from_disk(args.test_dir, fs=s3)
+        train_dataset, test_dataset = load_from_s3_into_pytorch_datset(
+            args.train_samples,
+            args.test_samples,
+            fs=s3,
+        )
     elif args.mode == "sagemaker":
         args, _ = addition_command_args(parser).parse_known_args()
-        train_dataset = load_from_disk(args.training_dir)
-        test_dataset = load_from_disk(args.test_dir)
-
+        train_dataset, test_dataset = load_from_s3_into_pytorch_datset(
+            args.train_samples,
+            args.test_samples,
+        )
+    else:
+        raise ValueError(
+            "--mode command line argument must be either 'sagemaker' or 'local'"
+        )
     logger.info(f" loaded train_dataset length is: {len(train_dataset)}")
     logger.info(f" loaded test_dataset length is: {len(test_dataset)}")
     trainer = create_training_model_instance()
