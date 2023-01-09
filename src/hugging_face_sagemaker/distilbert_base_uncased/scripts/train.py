@@ -32,8 +32,8 @@ def base_command_line_args():
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--epochs", type=int, default=1)
-    parser.add_argument("--train_samples", type=int, default=10000)
-    parser.add_argument("--test_samples", type=int, default=3000)
+    parser.add_argument("--train_samples", type=int, default=5000)
+    parser.add_argument("--test_samples", type=int, default=1300)
     parser.add_argument("--train_batch_size", type=int, default=32)
     parser.add_argument("--eval_batch_size", type=int, default=64)
     parser.add_argument("--warmup_steps", type=int, default=500)

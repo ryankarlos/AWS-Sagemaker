@@ -55,3 +55,34 @@ number of instances to run the endpoint.
 
 The script also sends an example request to the endpoint for generating a prediction.
 Finally, the endpoint is deleted by calling `predictor.delete_endpoint(<Endpoint-Name>)`
+
+
+### Running the train.py script locally
+
+To train the Hugging Face model locally, we can run the script with the local value for the --mode arg.
+In Pycharm, configurations add the `--mode local` to the parameters and we will also need to add
+env variables for the `ACCESS_KEY_ID` and `SECRET_ACCESS_KEY` as the script will need to download data
+from the S3 bucket using aws credentials.
+
+The code sets the following defaults via argparse, which can be overriden from the command line or via the
+Pycharm parameters in the configuration.
+
+![](../../../screenshots/local_training_script_default_args_hyperparams.png)
+
+Depending on machine specs, an example run is shown below which took 2 hours on an NVIDIA RTX 3080 graphics card, 64GB RAM, AMD Ryzen 9 5950X
+16 core processor, using the default hyperparam settings on a sampled training size of 5000 examples and test
+size of 1300 samples with the default learning rate.
+
+![](../../../screenshots/train_script_execution_console_output.png)
+
+
+The outputs (eval results and model artifact and metadata) should all be stored in the `scripts/output` and `scripts/model`
+folders respectively.
+These can then be uploaded to S3 for running the prediction workflow i.e. deploying the model to sagemaker endpoint for
+serving real time requests.
+
+```
+aws s3 cp model s3://sagemaker-experiments-ml --recursive
+```
+
+![](../../../screenshots/upload_model_to_S3.png)
