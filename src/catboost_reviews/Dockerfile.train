@@ -1,0 +1,13 @@
+#Download an open source TensorFlow Docker image
+FROM python:3.12
+
+# Copies the code inside the container
+
+RUN pip3 install -r requirements.txt
+
+COPY training /opt/ml/code/
+
+# Defines process.py as script entrypoint
+ENV SAGEMAKER_PROGRAM process.py
+
+ENTRYPOINT ["/bin/bash"]

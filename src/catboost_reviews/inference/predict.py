@@ -2,8 +2,9 @@
 # to implement the prediction for your own algorithm.
 
 from __future__ import print_function
-import joblib
+
 import flask
+from catboost import CatBoostRegressor
 from flask import Flask, jsonify
 import os
 import request
@@ -11,18 +12,16 @@ import request
 MODEL_PATH = '/opt/ml/'
 MODEL_NAME = '' 
 
+# Load the model by reading the `SM_MODEL_DIR` environment variable
+# which is passed to the container by SageMaker (usually /opt/ml/model).
 
 def load_model(model_dir: str):
     """
     Load the model from the specified directory.
     """
-    return joblib.load(os.path.join(model_dir, "model.joblib"))
+    return CatBoostRegressor().load_model(os.path.join(model_dir, "catboost_model"))
 
-
-# Load the model by reading the `SM_MODEL_DIR` environment variable
-# which is passed to the container by SageMaker (usually /opt/ml/model).
-
-            
+     
 # A singleton for holding the model. This simply loads the model and holds it.
 # It has a predict function that does a prediction based on the model and the input data.
 class CatBoostRegressorService(object):
@@ -30,6 +29,7 @@ class CatBoostRegressorService(object):
     @classmethod
     def get_model(cls):
         """Get the model object for this instance."""
+        
         return load_model(os.environ["SM_MODEL_DIR"])
 
     @classmethod
@@ -54,6 +54,6 @@ def ping():
 def transformation():
     # Do the prediction
     body = request.json
-    predictions = CatBoostRegressorService.predict(body).tolist() #predict() also loads the model
+    predictions = CatBoostRegressorService.predict(body) #predict() also loads the model
     print('predictions: ' + str(predictions[0]) + ', ' + str(predictions[1]))
     return {'predictions': predictions}

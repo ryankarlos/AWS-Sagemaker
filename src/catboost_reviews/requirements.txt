@@ -1,5 +1,11 @@
 catboost
 pandas
+scikit-learn
 flask
 gevent 
 gunicorn
+boto3
+sagemaker
+sagemaker-training
+polars 
+pyarrow
