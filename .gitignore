@@ -6,4 +6,5 @@ __pycache__
 model/
 venv/
 data/
-temp_creds.txt
+.env
+assume-role-output.txt

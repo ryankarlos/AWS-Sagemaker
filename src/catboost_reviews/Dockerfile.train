@@ -3,11 +3,11 @@ FROM python:3.12
 
 # Copies the code inside the container
 
-RUN pip3 install -r requirements.txt
+COPY requirements.txt /opt/ml/code/requirements.txt
+RUN pip3 install -r /opt/ml/code/requirements.txt
 
 COPY training /opt/ml/code/
-
 # Defines process.py as script entrypoint
 ENV SAGEMAKER_PROGRAM process.py
 
-ENTRYPOINT ["/bin/bash"]
+ENTRYPOINT ["python"]

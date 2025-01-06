@@ -10,9 +10,9 @@ RUN apt-get -y update && apt-get install -y --no-install-recommends \
 RUN wget https://bootstrap.pypa.io/get-pip.py && python3 get-pip.py && \
         rm -rf /root/.cache
 
-
+COPY requirements.txt /opt/ml/code/requirements.txt
 RUN pip3 install -r requirements.txt
-
+RUN pip3 install -r requirements.txt
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=TRUE

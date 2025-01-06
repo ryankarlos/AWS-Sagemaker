@@ -57,9 +57,6 @@ def train(args):
     path = os.path.join(model_dir, model_name)
     logging.info('saving to {}'.format(path))
     model.save_model(path)
-
-    m = model.load_model(path)
-    print(model.predict(X_val.to_pandas()))
     
 def get_parser():
     parser = argparse.ArgumentParser(
