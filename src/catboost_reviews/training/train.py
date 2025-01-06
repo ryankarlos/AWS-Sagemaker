@@ -73,8 +73,8 @@ def get_parser():
                     type=str,
                     default=os.environ.get('SM_OUTPUT_DIR', "model"))
     parser.add_argument('--model-name', type=str, default='catboost_model')
-    parser.add_argument('--train', type=str, default=os.environ.get('SM_CHANNEL_TRAIN', "data/processed"))
-    parser.add_argument('--test', type=str, default=os.environ.get('SM_CHANNEL_TEST',  "data/processed"))
+    parser.add_argument('--train', type=str, default=os.environ.get('SM_CHANNEL_TRAIN'))
+    parser.add_argument('--test', type=str, default=os.environ.get('SM_CHANNEL_TEST'))
     parser.add_argument('--iterations', type=int, default=1000)
     parser.add_argument('--lr', type=float, default=0.1)
     parser.add_argument('--depth', type=int, default=2)

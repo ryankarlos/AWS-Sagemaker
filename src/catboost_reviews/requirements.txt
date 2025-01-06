@@ -9,3 +9,5 @@ sagemaker
 sagemaker-training
 polars 
 pyarrow
+fsspec 
+s3fs

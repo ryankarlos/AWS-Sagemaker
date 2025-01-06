@@ -11,16 +11,14 @@ Generate temp creds for passing in as env vars to run container locally to acces
 https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_use-resources.html
 make a note of access key id and secret access key.
 
-We pass in duration seconds to determine how long the creds should be valid for. Here will 
-set it to ve valid for 7200 secs (2 hrs)
-
 ```
-aws sts assume-role --role-arn <role-arn> --role-session-name "RoleSession1" --profile IAM-user-name --duration-seconds 7200
+aws sts assume-role --role-arn <role-arn> --role-session-name "RoleSession1" --profile IAM-user-name 
 ```
 
 Build train docker images sm-catboost-train 
 
 ```bash
+cd src/catboost_reviews
 docker build -f Dockerfile.train -t sm-catboost-train .
 ```
 
@@ -45,8 +43,15 @@ and then specify the path to the .env file as --env-file argument to docker run 
 docker run -it  --env-file ./.env sm-catboost-train /opt/ml/code/process.py
 ```
 
+Similarly for the train script pass in the path to the train script in the container "/opt/ml/code/train.py" and also train and test channel s3 dir path (these should be output as logs from the processing container run or check s3 for the data and get the s3 uri)
 
-Similarly for the train script pass in the path to the train script in the container "/opt/ml/code/train.py"
+docker run -it  --env-file ./.env sm-catboost-train /opt/ml/code/train.py --train <s3-train-dir-url> --test <s3-val-dir-url>
 
 ### Running remote jobs in Sagemaker
+
+
+
+```
+sh build_and_push.sh Dockerfile.train sm-catboost-train
+```
 
