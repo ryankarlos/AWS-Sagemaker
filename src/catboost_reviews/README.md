@@ -2,6 +2,15 @@
 ## Instructions
 
 
+Install the libraies in requirements.txt in local virtual env to run some of the scripts locally
+
+```
+cd src/catboost_reviews
+python -m venv venv
+. venv/bin/activate
+pip install -r requirements.txt
+```
+
 ### Testing the scirpts locally outside Sagemaker
 
 Build docker train image and run container locally passing env vars for secrets
@@ -47,11 +56,23 @@ Similarly for the train script pass in the path to the train script in the conta
 
 docker run -it  --env-file ./.env sm-catboost-train /opt/ml/code/train.py --train <s3-train-dir-url> --test <s3-val-dir-url>
 
-### Running remote jobs in Sagemaker
+### Running jobs in Sagemaker
 
-
+First test container with training job in local mode
 
 ```
 sh build_and_push.sh Dockerfile.train sm-catboost-train
 ```
 
+
+Then start process or traing job (enter value for job arg accordingly) and set instance_type to local.
+
+
+```
+python sm_job_exec.py --role_arn <sagemaker-role-arn> --job <process/train> --instance_type=local
+```
+
+
+then start a remote sagemaker process or training job (dont pass in instance_type and it will default to "ml.m5.xlarge")
+
+ python training_job_exec.py --role_arn <sagemaker-role-arn>  --job <process/train>

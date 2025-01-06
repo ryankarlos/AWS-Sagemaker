@@ -18,6 +18,8 @@ from catboost import CatBoostRegressor
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+import os 
+os.environ['AWS_DEFAULT_REGION'] = <YOUR_REGION>
 
 def train(args):
     model_dir = args.model_dir

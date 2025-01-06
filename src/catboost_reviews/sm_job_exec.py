@@ -3,9 +3,10 @@ import boto3
 import sagemaker
 import argparse 
 import sys
+from sagemaker.processing import ScriptProcessor, ProcessingInput, ProcessingOutput
 
 
-def start_training_job(args):
+def start_sagemaker_job(args):
     region = boto3.Session().region_name
     sess = sagemaker.session.Session()
     bucket = sess.default_bucket()
@@ -28,19 +29,32 @@ def start_training_job(args):
         print('ECR container ARN: {}'.format(container_image_uri))
     print(container_image_uri)
 
-    estimator = Estimator(image_uri=container_image_uri,
-                    role=role,
-                    instance_count=instance_count,
-                    instance_type=instance_type,
-                    output_path=output_path,
-                    hyperparameters={
-                            'iterations': args.iterations,
-                            'lr':args.lr,
-                            'depth':args.depth
-                            })
-    print(f's3://{bucket}/{train_prefix}')
-    estimator.fit({'train': f's3://{bucket}/{train_prefix}',
-                        'test': f's3://{bucket}/{val_prefix}'})
+    if args.job == "train":
+        estimator = Estimator(image_uri=container_image_uri,
+                        role=role,
+                        instance_count=instance_count,
+                        instance_type=instance_type,
+                        output_path=output_path,
+                        hyperparameters={
+                                'iterations': args.iterations,
+                                'lr':args.lr,
+                                'depth':args.depth
+                                })
+        print(f's3://{bucket}/{train_prefix}')
+        estimator.fit({'train': f's3://{bucket}/{train_prefix}',
+                            'test': f's3://{bucket}/{val_prefix}'})
+    elif args.job == "process":
+        
+        script_processor = ScriptProcessor(command=['python3'],
+                        image_uri=container_image_uri,
+                        role=role,
+                        instance_count=instance_count,
+                        instance_type=instance_type)
+        script_processor.run(code='training/process.py')
+
+    else:
+        raise ValueError("Invalid job type, must be either 'train' or 'process'")
+
     
 
 def get_parser():
@@ -73,11 +87,12 @@ def get_parser():
     parser.add_argument('--iterations', type=int, default=1000)
     parser.add_argument('--lr', type=float, default=0.1)
     parser.add_argument('--depth', type=int, default=2)
+    parser.add_argument('--job', type=str, default="train")
 
     return parser
 
 
 if __name__ == "__main__":
     args = get_parser().parse_args()
-    start_training_job(args)
+    start_sagemaker_job(args)
     sys.exit(0)

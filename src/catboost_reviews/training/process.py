@@ -10,9 +10,10 @@ from sklearn.datasets import make_regression
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.inspection import permutation_importance
 from pathlib import Path
+import os
 
 # This instantiates a SageMaker session that we will be operating in.
-session = sagemaker.Session()
+
 
 def show_ranked_feature_importance_list(scores, data):
     """
@@ -58,6 +59,8 @@ def remove_features(lst, data, threshold):
     return data
 
 def process(args):
+    os.environ["AWS_DEFAULT_REGION"] = args.region
+    session = sagemaker.Session()
     data_set = fetch_california_housing()
     threshold = args.threshold
     train_ratio = args.train_ratio
@@ -126,13 +129,14 @@ def get_parser():
     parser = argparse.ArgumentParser(
         description="Script to process data for housing dataset."
     )
-        # sample code to get a hyperparam
     parser.add_argument("--data_output_dir",
                         help="data_output_dir",
                         type=str,
                         default="data/processed")
+    
 
-    # sample code to get a hyperparam
+    
+
     parser.add_argument("--test_ratio",
                         help="test_ratio",
                         type=float,
@@ -149,6 +153,10 @@ def get_parser():
                     help="threshold",
                     type=float,
                     default=0.01)
+    parser.add_argument("--region",
+                    help="aws region",
+                    type=str,
+                    default="us-east-1")
 
     return parser
 
